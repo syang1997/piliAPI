@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:mysql://114.55.144.154/pili?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: root
+    password: ssy111111
+    drover-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 3
+      maximum-pool-size: 10
+      max-lifetime: 30000
+      connection-test-query: SELECT 1
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+server:
+  port: 8181
