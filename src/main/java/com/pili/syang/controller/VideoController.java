@@ -8,6 +8,10 @@ import com.pili.syang.enums.StatusCode;
 import com.pili.syang.service.UserService;
 import com.pili.syang.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +31,8 @@ public class VideoController extends BaseController {
     @Autowired
     private UserService userService;
 
+
+    @CacheEvict(value = "hot")
     @PostMapping("/contribute")
     public BaseInfo uploadVideo(@RequestBody Video video) {
         if (video.getAuthor() == null) {
@@ -101,19 +107,37 @@ public class VideoController extends BaseController {
         return BaseInfo.BackInfo(StatusCode.SUCCESS, videoData);
     }
 
-
+    /**
+     * 首页热门 有新视频上传后清除
+     * @return
+     */
+    @Cacheable(value = "hot")
     @PostMapping("/hot")
     public BaseInfo hotClassify() {
         HashMap<String, List<Video>> hots = videoService.hotVideos();
         return BaseInfo.BackInfo(StatusCode.SUCCESS, hots);
     }
 
+    /**
+     * 首页的排行榜同样每天更新
+     * @param num
+     * @return
+     */
+    @Cacheable(value = "indextop")
     @PostMapping("/tops")
     public BaseInfo indexTops( Integer num) {
         HashMap<String, List<Video>> hots = videoService.topVideos(num);
         return BaseInfo.BackInfo(StatusCode.SUCCESS, hots);
     }
 
+    /**
+     * 排行榜中的数据 每天定时清除
+     * @param classify
+     * @param time
+     * @param num
+     * @return
+     */
+    @Cacheable(value = "top")
     @PostMapping("/top")
     public BaseInfo classifyTops( String classify,  long time, Integer num) {
         long daytime = 1000 * 3600 * 24*time;
@@ -128,5 +152,50 @@ public class VideoController extends BaseController {
         }
         Video video1 = videoService.getVideo(video.getVid());
         return BaseInfo.BackInfo(StatusCode.SUCCESS, video1);
+    }
+
+    @PostMapping("/my")
+    public BaseInfo getMyVideos(Integer uid,Integer num){
+        User user=new User();
+        user.setUid(uid);
+        Page<Video> myvideos = videoService.myvideos(user, num);
+        return BaseInfo.BackInfo(StatusCode.SUCCESS, myvideos);
+    }
+
+    @PostMapping("/updata")
+    public BaseInfo updataMyVideos(@RequestBody Video video){
+        Video video1 = videoService.getVideo(video.getVid());
+        video1.setVname(video.getVname());
+        video1.setClassify(video.getClassify());
+        video1.setIntro(video.getIntro());
+        video1.setOriginal(video.isOriginal());
+        videoService.upload(video1);
+        return BaseInfo.BackInfo(StatusCode.SUCCESS, null);
+    }
+
+    @PostMapping("/delete")
+    public BaseInfo deleteMyVideos(@RequestBody Video video){
+        videoService.deleteVideo(video);
+        return BaseInfo.BackInfo(StatusCode.SUCCESS, null);
+    }
+
+    @PostMapping("/data")
+    public BaseInfo dataMyVideos(Integer uid){
+        Object[] domainAndCount = videoService.findDomainAndCount(uid);
+        return BaseInfo.BackInfo(StatusCode.SUCCESS, domainAndCount);
+    }
+
+    @Cacheable(value = "indexNew")
+    @PostMapping("/day")
+    public BaseInfo dayVideoMsg(){
+        Integer[] stringIntegerMap = videoService.findcountClassity();
+        return BaseInfo.BackInfo(StatusCode.SUCCESS, stringIntegerMap);
+    }
+
+    //每天凌晨执行，清除缓存也就是跟新排行榜
+    @Scheduled(cron = "0 0 1 * * ?")
+    @CacheEvict(value = {"top","indextop","indexNew"})
+    public void chadelete(){
+
     }
 }

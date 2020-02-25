@@ -27,7 +27,8 @@ public class Comment {
     private Integer replies;//回复数
     private Integer statu;//状态 0 未读 1 已读
 
-    @OneToMany(mappedBy = "superior")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "superior")
     private List<Revert> sends=new LinkedList<>();
     /*
     一级评论直接对视频

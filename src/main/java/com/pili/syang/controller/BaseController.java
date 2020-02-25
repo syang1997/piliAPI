@@ -1,7 +1,5 @@
 package com.pili.syang.controller;
 
-import com.pili.syang.entity.BaseInfo;
-import com.pili.syang.entity.User;
 import com.pili.syang.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 

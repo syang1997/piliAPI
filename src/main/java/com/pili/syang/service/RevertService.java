@@ -4,4 +4,5 @@ import com.pili.syang.entity.Revert;
 
 public interface RevertService {
     public boolean addRevert(Revert revert);
+    public void addPraise(Integer id);
 }

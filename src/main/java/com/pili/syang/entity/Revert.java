@@ -15,9 +15,7 @@ public class Revert {
 
     private String msg;//内容
 
-    @ManyToOne(targetEntity = Comment.class)
-    @JoinColumn(name = "superior",referencedColumnName = "cid")
-    private Comment superior; //一级评论
+    private Integer superior; //一级评论id
     @ManyToOne(targetEntity = User.class)
     @JoinColumn(name = "acceptor",referencedColumnName = "uid")
     private User acceptor;//该二级级评论的接受方

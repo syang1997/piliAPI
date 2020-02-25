@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RevertServiceImpl implements RevertService {
+        public class RevertServiceImpl implements RevertService {
 
     @Autowired
     private RevertRepository revertRepository;
@@ -24,5 +24,12 @@ public class RevertServiceImpl implements RevertService {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void addPraise(Integer id) {
+        Revert byRid = revertRepository.findByRid(id);
+        byRid.setPraise(byRid.getPraise()+1);
+        revertRepository.save(byRid);
     }
 }

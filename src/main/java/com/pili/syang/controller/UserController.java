@@ -46,6 +46,7 @@ public class UserController extends BaseController {
     @PostMapping("/register")
     public BaseInfo register(@RequestBody User user) {
         user.setSex("男");
+        user.setFans(0);
         user.setImage("http://localhost:8181/uploads/images/default.png");
         int regsiter = userService.regsiter(user);
         if (regsiter == 1) {

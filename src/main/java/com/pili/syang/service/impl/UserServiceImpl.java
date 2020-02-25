@@ -68,4 +68,19 @@ public class UserServiceImpl implements com.pili.syang.service.UserService {
         return byUid;
     }
 
+    @Override
+    public void addFans(Integer uid) {
+        User byUid = userRepository.findByUid(uid);
+        byUid.setFans(byUid.getFans()+1);
+        userRepository.save(byUid);
+    }
+
+    @Override
+    public void decFans(Integer uid) {
+        User byUid = userRepository.findByUid(uid);
+        if(byUid.getFans()>1){
+            byUid.setFans(byUid.getFans()-1);
+        }
+        userRepository.save(byUid);
+    }
 }
